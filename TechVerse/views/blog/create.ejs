@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= typeof blog !=='undefined' ? 'Create Blog Post' : 'Edit Blog Post' %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <style>
+        .editor-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn {
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background-color: #0d6efd;
+        }
+
+        .status-selector {
+            display: flex;
+            gap: 15px;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+        <div class="editor-container">
+            <h1>
+                Create New Blog Post
+            </h1>
+
+            <% const formAction=(blog && blog.slug) ? '/blogs/' + blog.slug : '/blogs' ; %>
+                <form id="blogForm" method="POST" enctype="multipart/form-data" action="<%= formAction %>">
+                    <% if (blog && blog.slug) { %>
+                        <input type="hidden" name="_method" value="PUT">
+                        <% } %>
+
+
+
+
+
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                    value="<%= typeof formData !== 'undefined' && formData.title ? formData.title : (blog ? blog.title : '') %>"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="excerpt">Excerpt</label>
+                                <textarea class="form-control" id="excerpt" name="excerpt" rows="3"
+                                    placeholder="A short summary of the blog post (optional)"><%= typeof formData !== 'undefined' && formData.excerpt ? formData.excerpt : (blog ? blog.excerpt : '') %></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editor">Content</label>
+                                <textarea class="form-control" id="editor" name="content"
+                                    rows="10"><%= typeof formData !== 'undefined' && formData.content ? formData.content : (blog ? blog.content : '') %></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Categories</label>
+                                <div id="categories-container">
+                                    <% if (categories && categories.length> 0) { %>
+                                        <p>Existing Categories:</p>
+                                        <% categories.forEach(category=> { %>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="category<%= category._id %>" name="existingCategories"
+                                                    value="<%= category._id %>" <% if (typeof formData !=='undefined' &&
+                                                    formData.categories &&
+                                                    formData.categories.includes(category._id.toString())) { %>checked
+                                                <% } %>
+                                                    <% if (blog && blog.categories && blog.categories.some(bc=>
+                                                        bc._id.toString() === category._id.toString())) { %>checked <% }
+                                                            %>>
+                                                            <label class="form-check-label"
+                                                                for="category<%= category._id %>">
+                                                                <%= category.name %>
+                                                            </label>
+                                            </div>
+                                            <% }) %>
+                                                <% } %>
+
+                                                    <div class="mt-3">
+                                                        <label for="newCategories">Add New Categories
+                                                            (comma-separated):</label>
+                                                        <input type="text" class="form-control" id="new-category"
+                                                            name="newCategories"
+                                                            placeholder="e.g., Node.js, Express, MongoDB">
+                                                        <button type="button" id="add-category-btn"
+                                                            class="btn btn-secondary mt-2">Add
+                                                            Category</button>
+                                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tags">Tags (comma-separated)</label>
+                                <input type="text" class="form-control" id="tags" name="tags"
+                                    value="<%= typeof formData !== 'undefined' && formData.tags ? formData.tags : (blog && blog.tags ? blog.tags.join(', ') : '') %>"
+                                    placeholder="e.g., javascript, web-development, tutorial">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="featuredImage">Featured Image</label>
+                                <% if (blog && blog.featuredImage) { %>
+                                    <div class="mb-3">
+                                        <p>Current Image:</p>
+                                        <img src="<%= blog.featuredImage %>" alt="Featured Image" class="img-thumbnail"
+                                            style="max-width: 200px;">
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" name="deleteFeaturedImage"
+                                            id="deleteFeaturedImage" value="true">
+                                        <label class="form-check-label" for="deleteFeaturedImage">Delete
+                                            current image</label>
+                                    </div>
+                                    <input type="file" class="form-control-file" name="featuredImage" id="featuredImage"
+                                        accept="image/*">
+                                    <small class="form-text text-muted">Upload new image to replace
+                                        existing one</small>
+                                    <% } else { %>
+                                        <input type="file" class="form-control-file" name="featuredImage"
+                                            id="featuredImage" accept="image/*">
+                                        <% } %>
+                            </div>
+
+                            <input type="hidden" name="status" value="pending">
+
+
+
+
+                            <button type="submit" class="btn btn-primary">
+                                <%= blog ? 'Update and Resend for Approval' : 'Submit for Admin Approval' %>
+                            </button>
+                            
+                            <a href="<%= blog ? '/blogs/' + blog.slug : '/blogs' %>"
+                                class="btn btn-secondary ml-2">Cancel</a>
+                </form>
+        </div>
+        <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+        
+        <script>
+
+
+            // Initialize CKEditor with better error handling
+            document.addEventListener('DOMContentLoaded', function () {
+                try {
+                    const editorElement = document.getElementById('editor');
+                    if (editorElement) {
+                        ClassicEditor.create(editorElement, {
+                            toolbar: {
+                                items: [
+                                    'heading', '|',
+                                    'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|',
+                                    'outdent', 'indent', '|',
+                                    'imageUpload', 'blockQuote', 'insertTable', 'mediaEmbed',
+                                    'undo', 'redo'
+                                ]
+                            },
+                            simpleUpload: {
+                                uploadUrl: '/blogs/upload',
+                                withCredentials: true
+                            }
+                        }).then(editor => {
+                            window.editor = editor;
+                            console.log('CKEditor initialized successfully');
+                        }).catch(error => {
+                            console.error('CKEditor initialization failed:', error);
+                            editorElement.style.display = 'block';
+                            editorElement.style.minHeight = '300px';
+                        });
+                    }
+
+                    // Category management
+                    const addCategoryBtn = document.getElementById('add-category-btn');
+                    if (addCategoryBtn) {
+                        addCategoryBtn.addEventListener('click', function () {
+                            const input = document.getElementById('new-category');
+                            const categories = input.value.split(',').map(c => c.trim()).filter(c => c);
+
+                            if (categories.length) {
+                                const container = document.getElementById('categories-container');
+                                categories.forEach(category => {
+                                    const id = 'new-cat-' + category.replace(/\W+/g, '-');
+                                    if (!document.getElementById(id)) {
+                                        const div = document.createElement('div');
+                                        div.className = 'form-check form-check-inline';
+                                        div.innerHTML = `
+                                        <input class="form-check-input" type="checkbox" id="${id}" 
+                                               name="newCategories" value="${category}" checked>
+                                        <label class="form-check-label" for="${id}">${category}</label>
+                                    `;
+                                        container.insertBefore(div, input.parentNode);
+                                    }
+                                });
+                                input.value = '';
+                            }
+                        });
+                    }
+
+                    // Form submission handling
+                    const form = document.getElementById('blogForm');
+                    if (form) {
+                        form.addEventListener('submit', function (e) {
+                            if (window.editor) {
+                                document.getElementById('editor').value = window.editor.getData();
+                            }
+                            console.log('Form submitted with data:', new FormData(form));
+                        });
+                    }
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                }
+            });
+        </script>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

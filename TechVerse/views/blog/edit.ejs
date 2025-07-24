@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        <%= typeof blog !=='undefined' ? 'Edit Blog Post' : 'Create Blog Post' %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CKEditor CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <style>
+        .editor-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn {
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background-color: #0d6efd;
+        }
+
+        .status-selector {
+            display: flex;
+            gap: 15px;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+        <div class="editor-container">
+            <h1>Edit Blog Post</h1>
+
+           
+
+                    <% const formAction='/blogs/' + blog.slug %>
+                    <form id="blogForm" method="POST" action="/blogs/<%= blog.slug %>?_method=PUT" enctype="multipart/form-data">
+
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                value="<%= blog.title %>" required>
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="excerpt">Excerpt</label>
+                            <textarea class="form-control" id="excerpt" name="excerpt" rows="3"><%= blog.excerpt %></textarea>
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="editor">Content</label>
+                            <textarea class="form-control" id="editor" name="content"
+                                rows="10"><%= typeof formData !== 'undefined' && formData.content ? formData.content : (blog ? blog.content : '') %></textarea>
+                        </div>
+                    
+                        <div class="form-group">
+                            <label>Categories</label>
+                            <div id="categories-container">
+                                <% categories.forEach(category => { %>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox"
+                                            id="category<%= category._id %>" name="existingCategories"
+                                            value="<%= category._id %>"
+                                            <%= blog.categories.some(c => c.toString() === category._id.toString()) ? 'checked' : '' %>>
+                                        <label class="form-check-label" for="category<%= category._id %>">
+                                            <%= category.name %>
+                                        </label>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="tags">Tags (comma-separated)</label>
+                            <input type="text" class="form-control" id="tags" name="tags"
+                                value="<%= blog.tags.join(', ') %>">
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="featuredImage">Featured Image</label>
+                            <% if (blog.featuredImage) { %>
+                                <div class="current-image mb-3">
+                                    <img src="<%= blog.featuredImage %>" style="max-width: 200px;">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="deleteFeaturedImage"
+                                            id="deleteFeaturedImage" value="true">
+                                        <label class="form-check-label" for="deleteFeaturedImage">
+                                            Delete current image
+                                        </label>
+                                    </div>
+                                </div>
+                            <% } %>
+                            <input type="file" class="form-control-file" name="featuredImage" id="featuredImage">
+                        </div>
+                    
+                        <input type="hidden" name="status" value="pending">
+                          
+                          
+                    
+                        <button type="submit" class="btn btn-primary">
+                            <%= blog ? 'Update and Resend for Approval' : 'Submit for Admin Approval' %>
+                        </button>
+                        <a href="/blogs/<%= blog.slug %>" class="btn btn-secondary">Cancel</a>
+                    </form>
+                    
+        </div>
+
+       
+        <script>
+            ClassicEditor
+                .create(document.querySelector('#editor'))
+                .catch(error => {
+                    console.error('CKEditor error:', error);
+                });
+        </script>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

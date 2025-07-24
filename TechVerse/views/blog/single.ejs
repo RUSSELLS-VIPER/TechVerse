@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <%= blog.title %>
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <style>
+        .blog-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 1rem;
+        }
+
+        .author-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .related-post:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+
+        .like-btn {
+            cursor: pointer;
+        }
+
+        .tag-badge {
+            margin: 0 5px 5px 0;
+        }
+
+        .rounded-card {
+            border-radius: 1rem;
+        }
+
+        .login-modal .modal-content {
+            border-radius: 12px;
+        }
+
+        .comment-section {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 1.5rem 0;
+        }
+
+        .comment-card {
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .comment-author {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: #222;
+        }
+
+        .comment-meta {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .comment-body {
+            padding: 1rem;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .comment-actions {
+            padding: 0.5rem 1rem;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .comment-like-btn,
+        .comment-reply-btn {
+            border: none;
+            background: none;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+
+        .comment-like-btn:hover,
+        .comment-reply-btn:hover {
+            color: #007bff;
+        }
+
+        .comment-like-btn.liked {
+            color: #e74c3c;
+        }
+
+        .comment-like-btn:hover i {
+            color: #e74c3c;
+        }
+
+        .reply-form {
+            display: none;
+        }
+
+        .reply-form {
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin: 0.5rem 1rem;
+            display: none;
+        }
+
+        .reply-form textarea {
+            min-height: 80px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        textarea.form-control {
+            font-size: 0.95rem;
+            border-radius: 6px;
+        }
+
+        .reply-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        .replies-container {
+            margin-left: 2rem;
+            padding-left: 1rem;
+            border-left: 2px solid #e2e2e2;
+        }
+
+        .reply-card {
+            background: #fdfdfd;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .no-comments {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f9f9f9;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .add-comment-form {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .add-comment-form textarea {
+            min-height: 100px;
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            border: 1px solid #ccc;
+        }
+
+        .login-prompt {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <!-- Login Modal -->
+        <div class="modal fade login-modal" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content p-3">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title">Login Required</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body pt-0">
+                        <p>You need to login to like this post.</p>
+                        <div class="d-grid gap-2">
+                            <a href="/auth/login" class="btn btn-primary">Login</a>
+                            <a href="/auth/register" class="btn btn-outline-secondary">Register</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container my-5">
+            <article>
+                <h1 class="fw-bold mb-4">
+                    <%= blog.title %>
+                </h1>
+
+                <% if (blog.featuredImage) { %>
+                    <img src="<%= blog.featuredImage %>" class="img-fluid rounded mb-4" alt="<%= blog.title %>">
+                    <% } %>
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+                            <div class="d-flex align-items-center">
+                                <% if (blog.author && blog.author.profilePicture) { %>
+                                    <img src="/uploads/profile/<%= user.profilePicture %>" class="author-img"
+                                        alt="<%= blog.author.name %>">
+                                    <% } %>
+                                        <div>
+                                            <a href="<%= user?.role === 'admin' ? '/admin/users/' + blog.author?._id : '/users/' + blog.author?._id %>"
+                                                class="text-decoration-none text-primary fw-semibold h5">
+                                                <%= blog.author?.name %>
+                                            </a>
+                                            <small class="text-muted">
+                                                <%= new Date(blog.createdAt).toLocaleDateString() %> •
+                                                    <%= blog.readingTime %> min read •
+                                                        <%= blog.views %> views
+                                            </small>
+                                        </div>
+                            </div>
+                            <div>
+                                <span class="like-btn btn btn-outline-danger <%= isLiked ? 'text-danger' : '' %>"
+                                    data-blog-id="<%= blog._id %>" data-is-liked="<%= isLiked ? 'true' : 'false' %>">
+                                    <i class="bi <%= isLiked ? 'bi-heart-fill' : 'bi-heart' %>"></i>
+                                    <span class="like-count-display">
+                                        <%= blog.likes?.length || 0 %>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <% if (blog.categories?.length) { %>
+                            <div class="mb-3">
+                                <strong>Categories:</strong>
+                                <% blog.categories.forEach(cat=> { %>
+                                    <a href="/blogs/category/<%= cat._id %>"
+                                        class="badge bg-primary text-decoration-none me-1">
+                                        <%= cat.name %>
+                                    </a>
+                                    <% }) %>
+                            </div>
+                            <% } %>
+
+                                <% if (blog.tags?.length) { %>
+                                    <div class="mb-4">
+                                        <strong>Tags:</strong>
+                                        <% blog.tags.forEach(tag=> { %>
+                                            <a href="/blogs/tag/<%= tag %>"
+                                                class="badge bg-light border tag-badge text-dark text-decoration-none">
+                                                #<%= tag %>
+                                            </a>
+                                            <% }) %>
+                                    </div>
+                                    <% } %>
+
+                                        <div class="blog-content mb-5">
+                                            <%- blog.content %>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-5">
+                                            <% if (user && user.id===blog.author._id.toString()) { %>
+                                                <div class="btn-group mb-2">
+                                                    <a href="/blogs/<%= blog.slug %>/edit"
+                                                        class="btn btn-outline-primary mx-1 rounded">
+                                                        <i class="bi bi-pencil-square"></i> Edit
+                                                    </a>
+                                                    <form action="/blogs/<%= blog.slug %>?_method=DELETE" method="POST"
+                                                        onsubmit="return confirm('Are you sure you want to delete this blog?');">
+                                                        <button type="submit" class="btn btn-outline-danger">
+                                                            <i class="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <% } %>
+                                                    <a href="/blogs" class="btn btn-outline-secondary mb-2">← Back to
+                                                        Blogs</a>
+                                        </div>
+            </article>
+
+
+            <!-- Comments Section -->
+            <section id="comments" class="comment-section mt-5">
+                <h4 class="mb-4">Comments</h4>
+
+                <% if (comments?.length) { %>
+                    <div class="comments-list">
+                        <% comments.forEach(comment=> {
+                            const isLiked = comment.likes?.some(like => like.toString() === user?._id?.toString());
+                            %>
+                            <div class="d-flex mb-4 align-items-start" id="comment-<%= comment._id %>">
+                                <% if (comment.author?.profileImage) { %>
+                                    <img src="<%= comment.author.profileImage %>" class="rounded-circle me-3" width="40"
+                                        height="40" alt="avatar">
+                                    <% } else { %>
+                                        <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center text-white me-3"
+                                            style="width:40px; height:40px;">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <% } %>
+
+                                            <div class="flex-grow-1">
+                                                <strong>
+                                                    <%= comment.author?.username || 'Anonymous' %>
+                                                </strong>
+                                                <div class="text-muted small mb-2">
+                                                    <%= new Date(comment.createdAt).toLocaleDateString('en-US', {
+                                                        month: 'short' , day: 'numeric' , year: 'numeric' }) %>
+                                                </div>
+
+                                                <div class="mb-2">
+                                                    <%= comment.content %>
+                                                </div>
+
+                                                <div class="d-flex align-items-center gap-3 small text-muted mb-2">
+                                                    <button
+                                                        class="comment-like-btn border-0 bg-transparent d-flex align-items-center p-0 <%= isLiked ? 'liked' : '' %>"
+                                                        data-comment-id="<%= comment._id %>"
+                                                        data-is-liked="<%= isLiked %>">
+                                                        <i
+                                                            class="bi <%= isLiked ? 'bi-heart-fill' : 'bi-heart' %> me-1"></i>
+                                                            <span class="comment-like-count">
+                                                                <%= comment.likes?.length || 0 %>
+                                                            </span>
+
+                                                    </button>
+
+                                                    <% if (user) { %>
+                                                        <a href="javascript:void(0);"
+                                                            class="comment-reply-btn text-decoration-none"
+                                                            data-comment-id="<%= comment._id %>">Reply</a>
+                                                        <% } %>
+                                                </div>
+
+                                                <% if (user) { %>
+                                                    <div class="reply-form mt-2" id="reply-form-<%= comment._id %>">
+                                                        <form method="POST" action="/blogs/<%= blog.slug %>/comments">
+                                                            <input type="hidden" name="parentCommentId"
+                                                                value="<%= comment._id %>">
+                                                            <textarea class="form-control mb-2" name="content" rows="2"
+                                                                placeholder="Write a reply..." required></textarea>
+                                                            <div class="d-flex justify-content-end">
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-secondary me-2 cancel-reply"
+                                                                    data-comment-id="<%= comment._id %>">Cancel</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-sm btn-primary">Post</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <% } %>
+
+                                                        <% if (comment.replies?.length) { %>
+                                                            <div class="ms-4 mt-3 border-start ps-3">
+                                                                <% comment.replies.forEach(reply=> {
+                                                                    const replyLiked = reply.likes?.some(like =>
+                                                                    like.toString() ===
+                                                                    user?._id?.toString());
+                                                                    %>
+                                                                    <div class="d-flex mb-3"
+                                                                        id="comment-<%= reply._id %>">
+                                                                        <% if (reply.author?.profileImage) { %>
+                                                                            <img src="<%= reply.author.profileImage %>"
+                                                                                class="rounded-circle me-3" width="32"
+                                                                                height="32" alt="avatar">
+                                                                            <% } else { %>
+                                                                                <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center text-white me-3"
+                                                                                    style="width:32px; height:32px;">
+                                                                                    <i class="bi bi-person-fill"></i>
+                                                                                </div>
+                                                                                <% } %>
+
+                                                                                    <div>
+                                                                                        <strong>
+                                                                                            <%= reply.author?.username
+                                                                                                || 'Anonymous' %>
+                                                                                        </strong>
+                                                                                        <div
+                                                                                            class="text-muted small mb-1">
+                                                                                            <%= new
+                                                                                                Date(reply.createdAt).toLocaleDateString('en-US',
+                                                                                                { month: 'short' ,
+                                                                                                day: 'numeric' ,
+                                                                                                year: 'numeric' }) %>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <%= reply.content %>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="d-flex align-items-center gap-3 small text-muted mt-1">
+                                                                                            <button
+                                                                                                class="comment-like-btn border-0 bg-transparent d-flex align-items-center p-0 <%= replyLiked ? 'liked' : '' %>"
+                                                                                                data-comment-id="<%= reply._id %>"
+                                                                                                data-is-liked="<%= replyLiked %>">
+                                                                                                <i
+                                                                                                    class="bi <%= replyLiked ? 'bi-heart-fill' : 'bi-heart' %> me-1"></i>
+                                                                                                    <span class="comment-like-count">
+                                                                                                        <%= reply.likes?.length || 0 %>
+                                                                                                    </span>
+
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                    </div>
+                                                                    <% }); %>
+                                                            </div>
+                                                            <% } %>
+                                            </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } else { %>
+                        <div class="no-comments text-center py-4 text-muted">No comments yet. Be the first to comment!
+                        </div>
+                        <% } %>
+
+                            <% if (user) { %>
+                                <div class="add-comment-form mt-4">
+                                    <h5 class="mb-3">Add a comment</h5>
+                                    <form method="POST" action="/blogs/<%= blog.slug %>/comments">
+                                        <textarea class="form-control mb-3" name="content" rows="3"
+                                            placeholder="Write your comment..." required></textarea>
+                                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                                    </form>
+                                </div>
+                                <% } else { %>
+                                    <div class="login-prompt mt-4 text-center">
+                                        <p>Please <a href="/auth/login">log in</a> to leave a comment.</p>
+                                    </div>
+                                    <% } %>
+            </section>
+
+
+
+
+            <!-- Related Blogs -->
+            <% if (relatedBlogs?.length) { %>
+                <section class="mb-5">
+                    <h3 class="mb-4">You Might Also Like</h3>
+                    <div class="row">
+                        <% relatedBlogs.forEach(rel=> { %>
+                            <div class="col-md-4 mb-4">
+                                <div class="card related-post rounded-4 shadow-sm h-100 border-0 overflow-hidden">
+                                    <div class="position-relative">
+                                        <% if (rel.featuredImage) { %>
+                                            <img src="<%= rel.featuredImage.startsWith('/uploads/') ? rel.featuredImage : '/uploads/' + rel.featuredImage %>"
+                                                class="card-img-top" alt="<%= rel.title %>"
+                                                style="height: 200px; object-fit: cover; transition: transform 0.3s ease;">
+                                            <% } else { %>
+                                                <img src="/uploads/default.jpg" class="card-img-top" alt="Default Image"
+                                                    style="height: 200px; object-fit: cover;">
+                                                <% } %>
+                                    </div>
+
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title fw-semibold text-dark mb-2">
+                                            <%= rel.title %>
+                                        </h5>
+                                        <p class="card-text text-muted small mb-3">
+                                            <%= rel.excerpt %>
+                                        </p>
+                                        <a href="/blogs/<%= rel.slug || rel._id %>"
+                                            class="btn btn-sm btn-primary rounded-pill mt-auto px-3">
+                                            Read More
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <% }) %>
+                    </div>
+                </section>
+                <% } %>
+
+
+        </div>
+
+        <%- include('../partials/footer') %>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/js/like.js"></script>
+            <script src="/js/commentLike.js"></script>
+
+</body>
+
+</html>

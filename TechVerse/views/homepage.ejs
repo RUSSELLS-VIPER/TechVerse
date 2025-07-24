@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TechVerse - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Fonts + Bootstrap -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+   
+
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: #fff;
+            color: #222;
+            line-height: 1.6;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        .hero {
+            padding: 80px 0;
+            background-color: #f8f9fa;
+        }
+
+        .hero img {
+            border-radius: 16px;
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .card-blog {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card-blog:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-blog img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .card-blog .card-body {
+            padding: 20px;
+        }
+
+        .card-blog .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .card-blog .card-text {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .blog-meta {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .btn-outline-dark {
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 600;
+        }
+
+        .card-title {
+            font-weight: 600;
+        }
+
+        .card-body p {
+            font-size: 0.95rem;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 50px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-pills .nav-link.active {
+            background-color: #0d6dfc !important;
+            color: #fff !important;
+        }
+
+        .card-blog .badge {
+            letter-spacing: 0.5px;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        .hero img {
+            transition: transform 0.4s ease;
+        }
+
+        .hero img:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+
+<body>
+
+    <%- include('partials/header') %>
+
+        <!-- Hero Section -->
+        <section class="hero bg-light py-5">
+            <div class="container">
+                <% if (featuredBlogs && featuredBlogs.length> 0) {
+                    const hero = featuredBlogs[0]; %>
+                    <div class="row align-items-center justify-content-between g-5">
+                        <!-- Text Content -->
+                        <div class="col-lg-6">
+                            <h1 class="display-5 fw-bold mb-3 text-dark">
+                                <%= hero.title %>
+                            </h1>
+                            <p class="lead text-muted mb-4">
+                                <%= hero.excerpt || hero.content?.slice(0, 150) %>...
+                            </p>
+                            <a href="/blogs/<%= hero.slug %>" class="btn btn-primary btn-lg rounded-pill px-4">
+                                Read Article
+                            </a>
+                        </div>
+
+                        <!-- Hero Image -->
+                        <div class="col-lg-6">
+                            <div class="position-relative overflow-hidden rounded-4 shadow">
+                                <img src="<%= hero.featuredImage || '/uploads/default.jpg' %>" alt="Hero Image"
+                                    class="img-fluid w-100 h-100 object-fit-cover" style="max-height: 400px;">
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </section>
+
+
+        <% const BlogCard=(blog, badge='' , badgeColor='secondary' )=> { %>
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card-blog">
+                    <img src="<%= blog.featuredImage || '/uploads/default.jpg' %>" alt="..." />
+                    <div class="card-body">
+                        <% if (badge || blog.categories?.[0]?.name) { %>
+                            <span class="badge bg-<%= badgeColor %> mb-2">
+                                <%= badge || blog.categories?.[0]?.name %>
+                            </span>
+                            <% } %>
+                
+                                <h5 class="card-title">
+                                    <%= blog.title %>
+                                </h5>
+                
+                                <p class="card-text">
+                                    <%= blog.excerpt || blog.content?.slice(0, 100) %>...
+                                </p>
+                
+                                <a href="/blogs/<%= blog.slug %>" class="btn btn-sm btn-outline-primary mt-2">Read More</a>
+                
+                                <div class="blog-meta d-flex justify-content-between mt-3">
+                                    <span>
+                                        <i class="bi bi-person"></i>
+                                        <a href="/users/<%= blog.author?._id %>">"
+                                            class="text-decoration-none text-primary fw-semibold">
+                                            <%= blog.author?.name %>
+                                        </a>
+                                         
+                                    </span>
+                                    <span>
+                                        <i class="bi bi-calendar3"></i>
+                                        <%= new Date(blog.createdAt).toDateString() %>
+                                    </span>
+                                </div>
+                    </div>
+                </div>
+                
+            </div>
+            <% } %>
+
+                <!-- Trending Blogs -->
+                <section class="py-5 bg-white">
+                    <div class="container">
+                        <h2 class="section-title text-center mb-5">🔥 Trending Now</h2>
+                        <div class="row g-4">
+                            <% trendingBlogs?.slice(0, 3).forEach(blog=> { %>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+                                        <div class="position-relative">
+                                            <img src="<%= blog.featuredImage || '/uploads/default.jpg' %>"
+                                                class="card-img-top" alt="<%= blog.title %>"
+                                                style="height: 220px; object-fit: cover; transition: transform 0.3s;">
+                                            <span
+                                                class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">🔥
+                                                Trending</span>
+                                        </div>
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title fw-semibold">
+                                                <%= blog.title %>
+                                            </h5>
+                                            <p class="card-text text-muted small">
+                                                <%= blog.excerpt || blog.content?.slice(0, 100) %>...
+                                            </p>
+                                            <a href="/blogs/<%= blog.slug %>"
+                                                class="btn btn-sm btn-primary mt-auto rounded-pill px-4">Read More</a>
+                                            <div
+                                                class="blog-meta d-flex justify-content-between align-items-center mt-3 text-muted small">
+                                                <span>
+                                                    <i class="bi bi-person-fill me-1"></i>
+                                                    <a href="/users/<%= blog.author?._id %>" class="text-decoration-none text-primary fw-semibold">
+                                                        <%= blog.author?.name %>
+                                                    </a>
+                                                </span>
+                                                  
+                                                
+                                                <span><i class="bi bi-calendar3 me-1"></i>
+                                                    <%= new Date(blog.createdAt).toLocaleDateString() %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Latest Blog -->
+                <section class="py-5 bg-light">
+                    <div class="container">
+                        <h2 class="section-title text-center mb-5">🕔 Latest Posts</h2>
+                        <div class="row g-4">
+                            <% trendingBlogs?.slice(3, 9).forEach(blog=> { %>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+                                        <div class="position-relative">
+                                            <img src="<%= blog.featuredImage || '/uploads/default.jpg' %>" class="card-img-top" alt="<%= blog.title %>"
+                                                style="height: 220px; object-fit: cover; transition: transform 0.3s;">
+                                            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                                                🕔 Latest Posts
+                                            </span>
+                                        </div>
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title fw-semibold text-dark">
+                                                <%= blog.title %>
+                                            </h5>
+                                    
+                                            <p class="card-text text-muted small">
+                                                <%= blog.excerpt || blog.content?.slice(0, 100) %>...
+                                            </p>
+                                    
+                                            <a href="/blogs/<%= blog.slug %>" class="btn btn-sm btn-primary mt-auto rounded-pill px-4">Read More</a>
+                                    
+                                            <div class="blog-meta d-flex justify-content-between align-items-center mt-3 text-muted small">
+                                                <span>
+                                                    <i class="bi bi-person-fill me-1"></i>
+                                                    <a href="/users/<%= blog.author?._id %>" class="text-decoration-none text-primary fw-semibold">
+                                                        <%= blog.author?.name %>
+                                                    </a>
+                                                     
+                                                     
+                                                </span>
+                                                <span>
+                                                    <i class="bi bi-calendar3 me-1"></i>
+                                                    <%= new Date(blog.createdAt).toLocaleDateString() %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <% }) %>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Browse by Categories with Tab Navigation -->
+                <section class="py-5 bg-light">
+                    <div class="container">
+                        <h2 class="section-title text-center mb-5">📚 Browse by Categories</h2>
+
+                        <!-- Nav Pills -->
+                        <ul class="nav nav-pills justify-content-center flex-wrap gap-2 mb-4" id="category-tab"
+                            role="tablist">
+                            <% blogsByCategory?.forEach((group, index)=> {
+                                const rawSlug = group.categorySlug || group.categoryName || group._id || 'category';
+                                const safeSlug = rawSlug.toString().replace(/[^\w-]/g, '-').toLowerCase();
+                                %>
+                                <li class="nav-item" role="presentation">
+                                    <button
+                                        class="nav-link rounded-pill px-4 py-2 fw-semibold <%= index === 0 ? 'active' : '' %>"
+                                        id="tab-<%= safeSlug %>" data-bs-toggle="tab"
+                                        data-bs-target="#pane-<%= safeSlug %>" type="button" role="tab"
+                                        aria-controls="pane-<%= safeSlug %>"
+                                        aria-selected="<%= index === 0 ? 'true' : 'false' %>">
+                                        <%= group.categoryName %>
+                                    </button>
+                                </li>
+                                <% }); %>
+                        </ul>
+
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="category-tabContent">
+                            <% blogsByCategory?.forEach((group, index)=> {
+                                const rawSlug = group.categorySlug || group.categoryName || group._id || 'category';
+                                const safeSlug = rawSlug.toString().replace(/[^\w-]/g, '-').toLowerCase();
+                                const blogs = group.blogs?.slice(0, 3) || [];
+                                %>
+                                <div class="tab-pane fade <%= index === 0 ? 'show active' : '' %>"
+                                    id="pane-<%= safeSlug %>" role="tabpanel" aria-labelledby="tab-<%= safeSlug %>">
+
+                                    <% if (blogs.length) { %>
+                                        <div class="row g-4">
+                                            <% blogs.forEach(blog=> { %>
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div
+                                                        class="card h-100 shadow-lg border-0 rounded-4 overflow-hidden">
+                                                        <div class="position-relative">
+                                                            <img src="<%= blog.featuredImage || '/uploads/default.jpg' %>"
+                                                                class="card-img-top" alt="Blog Image"
+                                                                style="height: 200px; object-fit: cover; transition: transform 0.3s;">
+                                                            <span
+                                                                class="badge bg-secondary position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm text-uppercase">
+                                                                <%= group.categoryName %>
+                                                            </span>
+                                                        </div>
+                                                        <div class="card-body d-flex flex-column">
+                                                            <h5 class="card-title fw-semibold text-dark">
+                                                                <%= blog.title %>
+                                                            </h5>
+                                                            <p class="card-text text-muted small">
+                                                                <%= blog.excerpt || blog.content?.slice(0, 100) %>...
+                                                            </p>
+                                                            <a href="/blogs/<%= blog.slug || blog._id %>"
+                                                                class="btn btn-sm btn-primary mt-auto rounded-pill px-4">Read
+                                                                More</a>
+                                                            <div
+                                                                class="blog-meta d-flex justify-content-between align-items-center mt-3 text-muted small">
+                                                                <span>
+                                                                    <i class="bi bi-person-fill me-1"></i>
+                                                                    <a href="/users/<%= blog.author?._id %>" class="text-decoration-none text-primary fw-semibold">
+                                                                        <%= blog.author?.name %>
+                                                                    </a>
+                                                                     
+                                                                              </span>
+                                                                <span><i class="bi bi-calendar3 me-1"></i>
+                                                                    <%= new Date(blog.createdAt).toLocaleDateString() %>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="text-center text-muted py-4">No blogs available in this
+                                                category.</div>
+                                            <% } %>
+
+                                                <!-- See all blogs in this category -->
+                                                <div class="text-center mt-4">
+                                                    <a href="/list?category=<%= encodeURIComponent(group.categorySlug || group.categoryName || group._id) %>"
+                                                        class="btn btn-outline-dark rounded-pill px-4 py-2">
+                                                        See All Blogs in <%= group.categoryName %>
+                                                    </a>
+                                                </div>
+                                </div>
+                                <% }); %>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Browse by Tags with Tab Navigation -->
+                <section class="py-5 bg-white">
+                    <div class="container">
+                        <h2 class="section-title text-center mb-5">🏷️ Browse by Tags</h2>
+
+                        <!-- Tag Nav Pills -->
+                        <ul class="nav nav-pills justify-content-center flex-wrap gap-2 mb-4" id="tag-tab"
+                            role="tablist">
+                            <% blogsByTag?.forEach((group, index)=> {
+                                const rawTag = group._id || `tag-${index}`;
+                                const safeTag = rawTag.toString().replace(/[^\w-]/g, '-').toLowerCase();
+                                %>
+                                <li class="nav-item" role="presentation">
+                                    <button
+                                        class="nav-link rounded-pill px-4 py-2 fw-semibold <%= index === 0 ? 'active' : '' %>"
+                                        id="tab-<%= safeTag %>" data-bs-toggle="tab"
+                                        data-bs-target="#pane-<%= safeTag %>" type="button" role="tab"
+                                        aria-controls="pane-<%= safeTag %>"
+                                        aria-selected="<%= index === 0 ? 'true' : 'false' %>">
+                                        #<%= rawTag %>
+                                    </button>
+                                </li>
+                                <% }); %>
+                        </ul>
+
+                        <!-- Tag Tab Content -->
+                        <div class="tab-content" id="tag-tabContent">
+                            <% blogsByTag?.forEach((group, index)=> {
+                                const rawTag = group._id || `tag-${index}`;
+                                const safeTag = rawTag.toString().replace(/[^\w-]/g, '-').toLowerCase();
+                                const blogs = group.blogs?.slice(0, 3) || [];
+                                %>
+                                <div class="tab-pane fade <%= index === 0 ? 'show active' : '' %>"
+                                    id="pane-<%= safeTag %>" role="tabpanel" aria-labelledby="tab-<%= safeTag %>">
+
+                                    <% if (blogs.length) { %>
+                                        <div class="row g-4">
+                                            <% blogs.forEach(blog=> { %>
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div
+                                                        class="card h-100 shadow-lg border-0 rounded-4 overflow-hidden">
+                                                        <div class="position-relative">
+                                                            <img src="<%= blog.featuredImage || '/uploads/default.jpg' %>"
+                                                                class="card-img-top" alt="Blog Image"
+                                                                style="height: 200px; object-fit: cover; transition: transform 0.3s;">
+                                                            <span
+                                                                class="badge bg-success position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm text-uppercase">
+                                                                #<%= rawTag %>
+                                                            </span>
+                                                        </div>
+                                                        <div class="card-body d-flex flex-column">
+                                                            <h5 class="card-title fw-semibold text-dark">
+                                                                <%= blog.title %>
+                                                            </h5>
+                                                            <p class="card-text text-muted small">
+                                                                <%= blog.excerpt || blog.content?.slice(0, 100) %>...
+                                                            </p>
+                                                            <a href="/blogs/<%= blog.slug || blog._id %>"
+                                                                class="btn btn-sm btn-primary mt-auto rounded-pill px-4">Read
+                                                                More</a>
+                                                            <div
+                                                                class="blog-meta d-flex justify-content-between align-items-center mt-3 text-muted small">
+                                                                <span>
+                                                                    <i class="bi bi-person-fill me-1"></i>
+                                                                    <a href="/users/<%= blog.author?._id %>" class="text-decoration-none text-primary fw-semibold">
+                                                                        <%= blog.author?.name %>
+                                                                    </a>
+                                                                     
+                                                                              </span>
+                                                                <span><i class="bi bi-calendar3 me-1"></i>
+                                                                    <%= new Date(blog.createdAt).toLocaleDateString() %>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="text-center text-muted py-4">No blogs available for this tag.
+                                            </div>
+                                            <% } %>
+
+                                                <!-- See all blogs by tag -->
+                                                <div class="text-center mt-4">
+                                                    <a href="/list?tag=<%= encodeURIComponent(rawTag) %>"
+                                                        class="btn btn-outline-dark rounded-pill px-4 py-2">
+                                                        See All Blogs for #<%= rawTag %>
+                                                    </a>
+                                                </div>
+                                </div>
+                                <% }); %>
+                        </div>
+                    </div>
+                </section>
+
+                <%- include('partials/footer') %>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+                    <script>
+                        const loadMoreBtn = document.getElementById("loadMoreBtn");
+                        const cards = document.querySelectorAll(".latest-post-card");
+                        let visibleCount = 6;
+
+                        if (loadMoreBtn) {
+                            loadMoreBtn.addEventListener("click", () => {
+                                const nextBatch = Array.from(cards).slice(visibleCount, visibleCount + 3);
+                                nextBatch.forEach(card => card.classList.remove("d-none"));
+                                visibleCount += 3;
+                                if (visibleCount >= cards.length) {
+                                    loadMoreBtn.style.display = "none";
+                                }
+                            });
+                        }
+                    </script>
+
+
+
+
+
+</body>
+
+</html>
